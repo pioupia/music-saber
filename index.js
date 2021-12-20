@@ -1,7 +1,14 @@
 const express = require("express"),
     app = express(),
-    websocket = require("./Websocket"),
-    path = require("path");
+    websocket = require("./modules/Websocket"),
+    { createServer }= require('https'),
+    { readFileSync } = require("fs"),
+    path = require("path"),
+    basePath = path.dirname(__filename),
+    server = createServer({
+        key: readFileSync(basePath + '/key.pem'),
+        cert: readFileSync(basePath + '/cert.pem')
+    }, app);
 
 const ws = new websocket();
 ws.listen();
@@ -15,4 +22,4 @@ app.get('/', (req, res) => {
 })
 
 
-app.listen(3000);
+server.listen(3000);
