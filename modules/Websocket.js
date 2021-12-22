@@ -1,12 +1,4 @@
-const { WebSocketServer } = require("ws"),
-    { createServer }= require('https'),
-    { readFileSync } = require("fs"),
-    path = require("path"),
-    basePath = path.dirname(__dirname),
-    server = createServer({
-        key: readFileSync(basePath + '/key.pem'),
-        cert: readFileSync(basePath + '/cert.pem')
-    });
+const { WebSocketServer } = require("ws");
 
 module.exports = class{
     constructor(options) {
@@ -16,13 +8,12 @@ module.exports = class{
     }
 
     listen(){
-        this.wss = new WebSocketServer({ server });
-        this.wss.on("ready", () => console.log(0))
+        this.wss = new WebSocketServer({ port: this.port });
         this.wss.on('connection', ws => this.connectionOpen(ws, this));
-        server.listen(this.port);
     }
 
     connectionOpen(ws, _this){
+        console.log(0)
         const id = Date.now().toString(9);
         _this.connections.push({ws, id});
         ws.on('message', data => {

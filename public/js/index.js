@@ -1,7 +1,7 @@
 class game{
     constructor() {
         this.isMobile = window.innerWidth < 1200;
-        this.websocket = new webSocket('wss://localhost:8080');
+        this.websocket = new webSocket('ws://192.168.0.86:8080');
     }
     init(){
         // Registering events
@@ -26,38 +26,18 @@ class game{
     }
 
     mobilePerms(){
-        this.websocket.send("posChange", "test")
-        const options = { frequency: 60, referenceFrame: 'device' };
-        const sensor = new AbsoluteOrientationSensor(options);
-
-        sensor.addEventListener('reading', (...data) => {
-            // model is a Three.js object instantiated elsewhere.
-            this.websocket.send("posChange", ...data);
+        this.websocket.send("posChange", "test");
+        const _this = this;
+        window.addEventListener("deviceorientation", ev => {
+            _this.websocket.send("posChange", ev);
+            console.log(ev);
         });
-        sensor.addEventListener('error', error => {
-            this.websocket.send("posChange", error);
-            if (event.error.name == 'NotReadableError') {
-                this.websocket.send("posChange", "Sensor is not available.");
-                console.log("Sensor is not available.");
-            }
-        });
-        Promise.all([navigator.permissions.query({ name: "accelerometer" }),
-            navigator.permissions.query({ name: "magnetometer" }),
-            navigator.permissions.query({ name: "gyroscope" })])
-            .then(results => {
-                if (results.every(result => result.state === "granted")) {
-                    sensor.start();
-                    this.websocket.send("posChange", "Sensor started");
-                } else {
-                    this.websocket.send("posChange", "No permissions to use AbsoluteOrientationSensor.");
-                    console.log("No permissions to use AbsoluteOrientationSensor.");
-                }
-            }).catch((...e) => {
-            this.websocket.send("posChange", "error");
-            this.websocket.send("posChange", ...e);
-        })
     }
 }
 
 const g = new game();
 g.init();
+window.addEventListener("deviceorientation", ev => {
+    g.websocket.send("posChange", ev);
+    console.log(ev);
+});
