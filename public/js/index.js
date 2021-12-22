@@ -1,7 +1,7 @@
 class game{
     constructor() {
         this.isMobile = window.innerWidth < 1200;
-        this.websocket = new webSocket('ws://192.168.0.86:8080');
+        this.websocket = new webSocket('ws://'+document.domain+':8080');
     }
     init(){
         // Registering events
@@ -37,7 +37,3 @@ class game{
 
 const g = new game();
 g.init();
-window.addEventListener("deviceorientation", ev => {
-    g.websocket.send("posChange", ev);
-    console.log(ev);
-});
